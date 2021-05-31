@@ -93,7 +93,6 @@ class GetTokensView(APIView):
         CustomUser = get_user_model()
         email = request.data.get('email')
         password = request.data.get('password')
-        print(email, password)
         response = Response()
         if (email is None) or (password is None):
             raise exceptions.AuthenticationFailed('Email/password required')
@@ -112,7 +111,7 @@ class GetTokensView(APIView):
         refresh_token = generate_refresh_token(user)
 
         response.set_cookie(key='refreshtoken', value=refresh_token,
-                            httponly=True)
+                samesite='None', secure=True, httponly=True)
         response.data = {
             'access_token': access_token,
             'user': serialized_user,
