@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activate account</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        font-size: 62.5%;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: "Montserrat", sans-serif;
+        font-size: 1.6rem;
+      }
+
+      main {
+        padding: 15px 20px;
+        border-radius: 8px;
+        background: #aaa;
+      }
+
+      h1, a {
+        text-align: center;
+      }
+
+      h1 {
+        color: #fff;
+      }
+
+      a {
+        display: block;
+        margin-top: 10px;
+        padding: 10px;
+        font-size: 3.2rem;
+        font-weight: bold;
+        text-decoration: none;
+        background: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Twój link aktywacyjny:</h1>
+      <a href="{{ link }}">Kliknij tutaj</a>
+    </main>
+  </body>
+</html>

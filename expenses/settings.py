@@ -14,8 +14,8 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-#with open('secrets.json', mode='r') as secrets:
-#    secret = json.load(secrets)
+with open('secrets.json', mode='r') as secrets:
+    secret = json.load(secrets)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -28,6 +28,18 @@ SECRET_KEY = 'django-insecure-z7y-j&!zex4=@olcr@uo0+%jh^@kp@_bblksqp(c&ltp-o(b!q
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+
+HOST = 'http://localhost'
+HOST_PORT = ':8000/'
+ACTIVATION_URL = 'activate/'
+FRONTEND_PORT = ':3000'
+
+EMAIL_HOST = secret['EMAIL_HOST']
+EMAIL_PORT = secret['EMAIL_PORT']
+EMAIL_HOST_USER = secret['EMAIL_HOST_USER']
+EMAIL_HOST_PASSWORD = secret['EMAIL_HOST_PASSWORD']
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 # Application definition
@@ -50,11 +62,11 @@ CORS_ALLOW_CREDENTIALS = True
 #CORS_REPLACE_HTTPS_REFERER = True
 
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
+    HOST + FRONTEND_PORT,
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
+    HOST + FRONTEND_PORT,
 ]
 
 ''' uncomment on production '''
@@ -71,7 +83,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': [
         # comment BrowsableAPIRenderer on production
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        #'rest_framework.renderers.BrowsableAPIRenderer',
         'rest_framework.renderers.JSONRenderer',
     ]
 }
@@ -93,7 +105,7 @@ ROOT_URLCONF = 'expenses.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
