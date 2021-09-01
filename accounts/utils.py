@@ -27,6 +27,7 @@ def generate_refresh_token(custom_user):
                                settings.SECRET_KEY, algorithm='HS256')
     return refresh_token
 
+
 def generate_activation_token():
-    characters = string.ascii_letters + string.digits   
+    characters = string.ascii_letters + string.digits
     return "".join(random.choice(characters) for i in range(30))

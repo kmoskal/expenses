@@ -5,4 +5,3 @@ urlpatterns = [
     path('', ExpensesList.as_view()),
     path('expense/<int:pk>', ExpenseDetail.as_view()),
 ]
-        

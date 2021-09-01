@@ -23,8 +23,10 @@ class RegisterCustomUser(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            activate_account = ActivateAccount(email=serializer.data['email'],
-                              token=generate_activation_token())
+            activate_account = ActivateAccount(
+                email=serializer.data['email'],
+                token=generate_activation_token()
+            )
             activate_account.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -41,7 +43,7 @@ class ActivateAccountView(APIView):
         user.is_active = True
         user.save()
         account.delete()
-        return Response('Account successfully activated')
+        return Response({'detail': 'Account successfully activated'})
 
 
 @method_decorator(csrf_protect, name='put')
@@ -52,11 +54,16 @@ class ProfileView(APIView):
         return Response({'user': serialized_user})
 
     def put(self, request):
-        serialized_user = CustomUserProfileUpdateSerializer(request.user, data=request.data)
+        serialized_user = CustomUserProfileUpdateSerializer(
+            request.user, data=request.data
+        )
         if serialized_user.is_valid():
             serialized_user.save()
             return Response(serialized_user.data)
-        return Response(serialized_user.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            serialized_user.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @method_decorator(csrf_protect, name='post')
@@ -71,8 +78,11 @@ class RefreshTokenView(APIView):
             raise exceptions.AuthenticationFailed(
                 'Authentication credentials were not provided.')
         try:
-            payload = jwt.decode(refresh_token, 
-                settings.SECRET_KEY, algorithms='HS256')
+            payload = jwt.decode(
+                refresh_token,
+                settings.SECRET_KEY,
+                algorithms='HS256'
+            )
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed(
                 'Expired refresh token, please login again.')
@@ -110,8 +120,10 @@ class GetTokensView(APIView):
         access_token = generate_access_token(user)
         refresh_token = generate_refresh_token(user)
 
-        response.set_cookie(key='refreshtoken', value=refresh_token,
-                samesite='None', secure=True, httponly=True)
+        response.set_cookie(
+            key='refreshtoken', value=refresh_token,
+            samesite='None', secure=True, httponly=True
+        )
         response.data = {
             'access_token': access_token,
             'user': serialized_user,
