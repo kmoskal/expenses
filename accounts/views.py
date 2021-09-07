@@ -122,7 +122,7 @@ class GetTokensView(APIView):
 
         response.set_cookie(
             key='refreshtoken', value=refresh_token,
-            samesite='None', secure=True, httponly=True
+            samesite='None', secure=False, httponly=False
         )
         response.data = {
             'access_token': access_token,
