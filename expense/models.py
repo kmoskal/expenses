@@ -6,7 +6,7 @@ class Category(models.Model):
     user = models.ForeignKey(
         get_user_model(), related_name='category', on_delete=models.CASCADE
     )
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
@@ -16,7 +16,7 @@ class Priority(models.Model):
     user = models.ForeignKey(
         get_user_model(), related_name='priority', on_delete=models.CASCADE
     )
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
