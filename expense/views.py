@@ -1,11 +1,18 @@
 from django.http import Http404
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
-from .models import Expense, Category, Priority
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+import datetime
+
+from .models import Category, Expense, Priority
 from .serializers import (
-        ExpenseSerializer, CategorySerializer, PrioritySerializer
-    )
+        CategorySerializer, ExpenseSerializer, PrioritySerializer
+)
+
+
+class BasicPagination(PageNumberPagination):
+    page_size_query_param = 'limit'
 
 
 class CategoryList(APIView):
@@ -95,13 +102,50 @@ class PriorityDetail(APIView):
         priority.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class ExpensesList(APIView):
     """
     List all expenses or create a new one
     """
+    pagination_class = BasicPagination
+    serializer_class = ExpenseSerializer
+
+    @property
+    def paginator(self):
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        else:
+            pass
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset,
+                                                self.request, view=self)
+
+    def get_paginated_response(self, data):
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
+
     def get(self, request, format=None):
-        expenses = Expense.objects.filter(user=self.request.user)
-        serializer = ExpenseSerializer(expenses, many=True)
+        this_year = datetime.datetime.now().year
+        this_month = datetime.datetime.now().month
+        expenses = Expense.objects.filter(user=self.request.user,
+                                          day__month=this_month,
+                                          day__year=this_year)
+
+        page = self.paginate_queryset(expenses)
+        if page is not None:
+            serializer = self.get_paginated_response(self.serializer_class(
+                page, many=True).data
+            )
+        else:
+            serializer = self.serializer_class(expenses, many=True)
+
         return Response(serializer.data)
 
     def post(self, request, format=None):
