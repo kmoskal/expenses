@@ -22,12 +22,12 @@ with open('secrets.json', mode='r') as secrets:
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-z7y-j&!zex4=@olcr@uo0+%jh^@kp@_bblksqp(c&ltp-o(b!q'
-#SECRET_KEY = secret['SECRET_KEY']
+# SECRET_KEY = secret['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'testserver']
 
 HOST = 'http://localhost'
 HOST_PORT = ':8000/'
@@ -59,7 +59,7 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
-#CORS_REPLACE_HTTPS_REFERER = True
+# CORS_REPLACE_HTTPS_REFERER = True
 
 CORS_ALLOWED_ORIGINS = [
     HOST + FRONTEND_PORT,
@@ -70,9 +70,9 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 ''' uncomment on production '''
-#CSRF_COOKIE_DOMAIN = ''
-#CSRF_COOKIE_SAMESITE = 'None'
-#CSRF_COOKIE_SECURE = True
+# CSRF_COOKIE_DOMAIN = ''
+# CSRF_COOKIE_SAMESITE = 'None'
+# CSRF_COOKIE_SECURE = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -83,7 +83,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': [
         # comment BrowsableAPIRenderer on production
-        #'rest_framework.renderers.BrowsableAPIRenderer',
+        # 'rest_framework.renderers.BrowsableAPIRenderer',
         'rest_framework.renderers.JSONRenderer',
     ]
 }
