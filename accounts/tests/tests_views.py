@@ -1,11 +1,12 @@
-from django.test import TestCase, Client
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-from django.conf import settings
-from accounts.models import ActivateAccount
-from http.cookies import SimpleCookie
 import datetime
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
+from django.urls import reverse
 import jwt
+
+from accounts.models import ActivateAccount
 
 
 class TestViews(TestCase):
@@ -22,7 +23,7 @@ class TestViews(TestCase):
             reverse('accounts-get-token'),
             {'email': 'user@user.com', 'password': 'foo'}
         )
-        
+
         self.token = response.json()['access_token']
         self.csrftoken = response.cookies['csrftoken'].value
 
@@ -47,7 +48,7 @@ class TestViews(TestCase):
             'first_name': True,
             'last_name': False
         }
-        
+
         self.response = self.client.put(
             reverse('accounts-profile-update'),
             data=data,
@@ -65,7 +66,8 @@ class TestViews(TestCase):
         self.response = self.client.get(
             reverse('accounts-activate', kwargs={'token': 'foo'})
         )
-        self.assertEqual(self.response.json()['detail'], 'No account to activate')
+        self.assertEqual(self.response.json()['detail'],
+                         'No account to activate')
 
     def test_refresh_token_view_without_cookies(self):
         # create a new client to delete cookies
@@ -83,13 +85,15 @@ class TestViews(TestCase):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=-2),
             'iat': datetime.datetime.utcnow()
         }
-        refresh_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        refresh_token = jwt.encode(payload, settings.SECRET_KEY,
+                                   algorithm='HS256')
         self.client.cookies['refreshtoken'] = refresh_token
         self.response = self.client.post(
             reverse('accounts-refresh-token')
         )
         self.assertEqual(self.response.status_code, 403)
-        self.assertIn(self.response.json()['detail'], 'Expired refresh token, please login again.')
+        self.assertIn(self.response.json()['detail'],
+                      'Expired refresh token, please login again.')
 
     def test_refresh_token_view_user_is_inactive(self):
         # set the id of a user to a non-existent user
@@ -98,7 +102,8 @@ class TestViews(TestCase):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(days=2),
             'iat': datetime.datetime.utcnow()
         }
-        refresh_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+        refresh_token = jwt.encode(payload, settings.SECRET_KEY,
+                                   algorithm='HS256')
         self.client.cookies['refreshtoken'] = refresh_token
         self.response = self.client.post(
             reverse('accounts-refresh-token')
@@ -112,7 +117,8 @@ class TestViews(TestCase):
             {'email': '', 'password': ''}
         )
         self.assertEqual(self.response.status_code, 403)
-        self.assertIn(self.response.json()['detail'], 'Invalid email or password')
+        self.assertIn(self.response.json()['detail'],
+                      'Invalid email or password')
 
     def test_get_tokens_view_no_password(self):
         self.response = self.client.post(
@@ -120,15 +126,17 @@ class TestViews(TestCase):
             {'email': 'user@user.com'}
         )
         self.assertEqual(self.response.status_code, 403)
-        self.assertIn(self.response.json()['detail'], 'Email/password required')
-        
+        self.assertIn(self.response.json()['detail'],
+                      'Email/password required')
+
     def test_get_tokens_view_no_email(self):
         self.response = self.client.post(
             reverse('accounts-get-token'),
             {'password': 'foo'}
         )
         self.assertEqual(self.response.status_code, 403)
-        self.assertIn(self.response.json()['detail'], 'Email/password required')
+        self.assertIn(self.response.json()['detail'],
+                      'Email/password required')
 
     def test_get_tokens_view_bad_password(self):
         self.response = self.client.post(
@@ -136,14 +144,15 @@ class TestViews(TestCase):
             {'email': 'user@user.com', 'password': 'baz'}
         )
         self.assertEqual(self.response.status_code, 403)
-        self.assertIn(self.response.json()['detail'], 'Invalid email or password')
+        self.assertIn(self.response.json()['detail'],
+                      'Invalid email or password')
 
     def test_get_token_user_is_inactive(self):
         user = self.User.objects.create(email='newuser@user.com')
         user.set_password('foo')
         user.save()
         self.c = Client()
-        
+
         self.response = self.c.post(
             reverse('accounts-get-token'),
             {'email': 'newuser@user.com', 'password': 'foo'}

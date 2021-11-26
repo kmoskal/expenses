@@ -1,7 +1,7 @@
-from django.test import TestCase, Client
-from django.urls import reverse
 from django.contrib.auth import get_user_model
-from django.conf import settings
+from django.test import Client, TestCase
+from django.urls import reverse
+
 from accounts.models import ActivateAccount
 
 
@@ -21,7 +21,6 @@ class TestUrls(TestCase):
         )
 
         self.token = response.json()['access_token']
-        #self.refresh_token = response.cookies['refreshtoken'].value
         self.csrftoken = response.cookies['csrftoken'].value
 
     def test_get_token(self):
@@ -48,7 +47,8 @@ class TestUrls(TestCase):
             **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
         )
         self.assertEqual(self.response.status_code, 200)
-        self.assertEqual(self.response.json()['user']['email'], 'user@user.com')
+        self.assertEqual(self.response.json()['user']['email'],
+                         'user@user.com')
 
     def test_update_profile(self):
         data = {
@@ -70,7 +70,7 @@ class TestUrls(TestCase):
 
     def test_register_status_201(self):
         self.response = self.client.post(
-            reverse('accounts-register'), 
+            reverse('accounts-register'),
             {'email': 'new@user.com', 'password': 'Foobarbaz1'}
         )
         self.assertEqual(self.response.status_code, 201)
@@ -78,7 +78,7 @@ class TestUrls(TestCase):
 
     def test_activate_account(self):
         self.client.post(reverse('accounts-register'),
-                        {'email': 'user1@user.com', 'password': 'Foobarbaz1'})
+                         {'email': 'user1@user.com', 'password': 'Foobarbaz1'})
         self.aa_token = ActivateAccount.objects.first().token
         self.response = self.client.get(
             reverse('accounts-activate', kwargs={'token': self.aa_token})
