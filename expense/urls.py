@@ -6,10 +6,13 @@ from .views import (
 )
 
 urlpatterns = [
-    path('', ExpensesList.as_view()),
-    path('expense/<int:pk>', ExpenseDetail.as_view()),
-    path('category', CategoryList.as_view()),
-    path('category/<int:pk>', CategoryDetail.as_view()),
-    path('priority', PriorityList.as_view()),
-    path('priority/<int:pk>', PriorityDetail.as_view()),
+    path('', ExpensesList.as_view(), name='expense-expense-list'),
+    path('expense/<int:pk>', ExpenseDetail.as_view(),
+         name='expense-expense-detail'),
+    path('category', CategoryList.as_view(), name='expense-category-list'),
+    path('category/<int:pk>', CategoryDetail.as_view(),
+         name='expense-category-detail'),
+    path('priority', PriorityList.as_view(), name='expense-priority-list'),
+    path('priority/<int:pk>', PriorityDetail.as_view(),
+         name='expense-priority-detail'),
 ]

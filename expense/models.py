@@ -38,5 +38,8 @@ class Expense(models.Model):
         null=True, on_delete=models.SET_NULL
     )
 
+    class Meta:
+        ordering = ['-day']
+
     def __str__(self):
         return f'{self.place} {str(self.price)}'
