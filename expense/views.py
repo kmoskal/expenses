@@ -132,11 +132,25 @@ class ExpensesList(APIView):
         return self.paginator.get_paginated_response(data)
 
     def get(self, request, format=None):
-        this_year = datetime.datetime.now().year
-        this_month = datetime.datetime.now().month
+        if self.request.GET.get('year'):
+            if 1 <= int(self.request.GET.get('year')) <= 9999:
+                year = self.request.GET.get('year')
+            else: 
+                raise Http404
+        else:
+            year = datetime.datetime.now().year
+
+        if self.request.GET.get('month'):
+            if 1 <= int(self.request.GET.get('month')) <= 12:
+                month = self.request.GET.get('month')
+            else:
+                raise Http404
+        else:
+            month = datetime.datetime.now().month
+
         expenses = Expense.objects.filter(user=self.request.user,
-                                          day__month=this_month,
-                                          day__year=this_year)
+                                          day__month=month,
+                                          day__year=year)
 
         page = self.paginate_queryset(expenses)
         if page is not None:
