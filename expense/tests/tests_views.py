@@ -347,43 +347,143 @@ class TestViews(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['results']), 5)
 
-    def test_get_expenses_with_query_param_year_passed(self):
-        params = urlencode({'year': date.today().year - 1})
-        response = self.client.get(
-            reverse('expense-expense-list') + '?' + params,
-            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['results']), 1)
-
     def test_get_expenses_with_query_param_year_out_of_range(self):
-        params = urlencode({'year': 0})
+        params = urlencode({'fyear': 0})
         response = self.client.get(
             reverse('expense-expense-list') + '?' + params,
             **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
         )
 
-        self.assertEqual(response.status_code, 404)
+        self.assertIn('detail', response.json())
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_expenses_with_query_param_year_passed(self):
+        params = urlencode({'fyear': date.today().year})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+        self.assertIn('results', response.json())
+        self.assertEqual(response.status_code, 200)
 
     def test_get_expenses_with_query_param_month_passed(self):
-        params = urlencode({'month': date.today().month})
+        params = urlencode({'fmonth': date.today().month})
         response = self.client.get(
             reverse('expense-expense-list') + '?' + params,
             **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.json()['results']), 5)
+        self.assertIn('results', response.json())
 
     def test_get_expenses_with_query_param_month_out_of_range(self):
-        params = urlencode({'month': 0})
+        params = urlencode({'fmonth': 0})
         response = self.client.get(
             reverse('expense-expense-list') + '?' + params,
             **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
         )
 
-        self.assertEqual(response.status_code, 404)
+        self.assertIn('detail', response.json())
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_expenses_with_query_param_day_out_of_range(self):
+        params = urlencode({'fday': 0})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+
+        self.assertIn('detail', response.json())
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_expenses_with_query_param_day_passed(self):
+        params = urlencode({'fday': date.today().day})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+
+        self.assertIn('results', response.json())
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_expenses_with_query_param_tyear_out_of_range(self):
+        params = urlencode({'tyear': 0})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+
+        self.assertIn('detail', response.json())
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_expenses_with_query_param_tyear_passed(self):
+        params = urlencode({'tyear': date.today().year})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+        self.assertIn('results', response.json())
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_expenses_with_query_param_tmonth_passed(self):
+        params = urlencode({'tmonth': date.today().month})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('results', response.json())
+
+    def test_get_expenses_with_query_param_tmonth_out_of_range(self):
+        params = urlencode({'tmonth': 0})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+
+        self.assertIn('detail', response.json())
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_expenses_with_query_param_tday_out_of_range(self):
+        params = urlencode({'tday': 0})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+
+        self.assertIn('detail', response.json())
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_expenses_with_query_param_tday_passed(self):
+        params = urlencode({'tday': date.today().day})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+
+        self.assertIn('results', response.json())
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_expenses_with_query_param_cat(self):
+        params = urlencode({'cat': 1})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+        
+        self.assertIn('results', response.json())
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_expenses_with_query_param_pri(self):
+        params = urlencode({'pri': 1})
+        response = self.client.get(
+            reverse('expense-expense-list') + '?' + params,
+            **{'HTTP_AUTHORIZATION': 'Bearer ' + self.token}
+        )
+        
+        self.assertIn('results', response.json())
+        self.assertEqual(response.status_code, 200)
 
     def test_get_all_expenses_with_pagination_limit(self):
         limit = 1
