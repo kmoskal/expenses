@@ -1,22 +1,14 @@
 from django.http import Http404
-from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from datetime import datetime
 
 from .models import Category, Expense, Priority
 from .serializers import (
         CategorySerializer, ExpenseSerializer, PrioritySerializer
 )
-
-MIN_YEAR = datetime.min.year
-MAX_YEAR = datetime.max.year
-MIN_MONTH = datetime.min.month
-MAX_MONTH = datetime.max.month
-MIN_DAY = datetime.min.day
-MAX_DAY = datetime.max.day
+from .utils import create_date_range
 
 
 class BasicPagination(PageNumberPagination):
@@ -141,73 +133,8 @@ class ExpensesList(APIView):
         return self.paginator.get_paginated_response(data)
 
     def get(self, request, format=None):
-        if self.request.GET.get('fyear'):
-            if MIN_YEAR <= int(self.request.GET.get('fyear')) <= MAX_YEAR:
-                fyear = self.request.GET.get('fyear')
-            else:
-                raise exceptions.ValidationError(
-                    {'detail': 'Year is out of range'}
-                )
-        else:
-            fyear = datetime.now().year
-
-        if self.request.GET.get('fmonth'):
-            if MIN_MONTH <= int(self.request.GET.get('fmonth')) <= MAX_MONTH:
-                fmonth = self.request.GET.get('fmonth')
-            else:
-                raise exceptions.ValidationError(
-                    {'detail': 'Month must be in 1..12'}
-                )
-        else:
-            fmonth = datetime.now().month
-
-        if self.request.GET.get('fday'):
-            if MIN_DAY <= int(self.request.GET.get('fday')) <= MAX_DAY:
-                fday = self.request.GET.get('fday')
-            else:
-                raise exceptions.ValidationError(
-                    {'detail': 'Day is out of range'}
-                )
-        else:
-            fday = MIN_DAY
-
-        if self.request.GET.get('tyear'):
-            if MIN_YEAR <= int(self.request.GET.get('tyear')) <= MAX_YEAR:
-                tyear = self.request.GET.get('tyear')
-            else:
-                raise exceptions.ValidationError(
-                    {'detail': 'Year is out of range'}
-                )
-        else:
-            tyear = datetime.now().year
-
-        if self.request.GET.get('tmonth'):
-            if MIN_MONTH <= int(self.request.GET.get('tmonth')) <= MAX_MONTH:
-                tmonth = self.request.GET.get('tmonth')
-            else:
-                raise exceptions.ValidationError(
-                    {'detail': 'Month must be in 1..12'}
-                )
-        else:
-            tmonth = datetime.now().month
-
-        if self.request.GET.get('tday'):
-            if MIN_DAY <= int(self.request.GET.get('tday')) <= MAX_DAY:
-                tday = self.request.GET.get('tday')
-            else:
-                raise exceptions.ValidationError(
-                    {'detail': 'Day is out of range'}
-                )
-        else:
-            tday = MAX_DAY
-
-        expenses = Expense.objects.filter(user=self.request.user,
-                                          day__day__gte=fday,
-                                          day__month__gte=fmonth,
-                                          day__year__gte=fyear,
-                                          day__day__lte=tday,
-                                          day__month__lte=tmonth,
-                                          day__year__lte=tyear)
+        date_range = create_date_range(self.request.query_params)
+        expenses = Expense.objects.filter(day__range=date_range)
 
         if self.request.GET.get('cat'):
             expenses = expenses.filter(category_id=self.request.GET.get('cat'))
