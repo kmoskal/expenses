@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.db.models import Count, Sum
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -150,7 +151,33 @@ class ExpensesList(APIView):
         else:
             serializer = self.serializer_class(expenses, many=True)
 
-        return Response(serializer.data)
+        # performing calculations for statistic
+        expenses_sum = expenses.aggregate(Sum('price'))
+
+        mostly_chosen_category = expenses.values('category'). \
+                annotate(Count('category')).order_by('-category__count')
+        if mostly_chosen_category:
+            mostly_chosen_category = mostly_chosen_category[0]
+
+        mostly_chosen_priority = expenses.values('priority'). \
+                annotate(Count('priority')).order_by('-priority__count')
+        if mostly_chosen_priority:
+            mostly_chosen_priority = mostly_chosen_priority[0]
+
+        mostly_chosen_place = expenses.values('place'). \
+                annotate(Count('place')).order_by('-place__count')
+        if mostly_chosen_place:
+            mostly_chosen_place = mostly_chosen_place[0]
+
+        updated_serializer = {'date_range': date_range}
+        updated_serializer.update({'statistics': {}})
+        updated_serializer['statistics'].update(expenses_sum)
+        updated_serializer['statistics'].update(mostly_chosen_place)
+        updated_serializer['statistics'].update(mostly_chosen_category)
+        updated_serializer['statistics'].update(mostly_chosen_priority)
+        updated_serializer.update(serializer.data)
+
+        return Response(updated_serializer)
 
     def post(self, request, format=None):
         serializer = ExpenseSerializer(data=request.data)
