@@ -3,6 +3,7 @@ from .views import (
     ExpensesList, ExpenseDetail,
     CategoryList, CategoryDetail,
     PriorityList, PriorityDetail,
+    SummaryMonthlyExpenses,
 )
 
 urlpatterns = [
@@ -15,4 +16,6 @@ urlpatterns = [
     path('priority', PriorityList.as_view(), name='expense-priority-list'),
     path('priority/<int:pk>', PriorityDetail.as_view(),
          name='expense-priority-detail'),
+    path('summary', SummaryMonthlyExpenses.as_view(), name='expense-monthly-summary'),
 ]
+

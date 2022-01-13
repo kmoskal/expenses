@@ -9,6 +9,8 @@ from .models import Category, Expense, Priority
 from .serializers import (
         CategorySerializer, ExpenseSerializer, PrioritySerializer
 )
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from .utils import create_date_range
 
 
@@ -155,17 +157,17 @@ class ExpensesList(APIView):
         expenses_sum = expenses.aggregate(Sum('price'))
 
         mostly_chosen_category = expenses.values('category'). \
-                annotate(Count('category')).order_by('-category__count')
+            annotate(Count('category')).order_by('-category__count')
         if mostly_chosen_category:
             mostly_chosen_category = mostly_chosen_category[0]
 
         mostly_chosen_priority = expenses.values('priority'). \
-                annotate(Count('priority')).order_by('-priority__count')
+            annotate(Count('priority')).order_by('-priority__count')
         if mostly_chosen_priority:
             mostly_chosen_priority = mostly_chosen_priority[0]
 
         mostly_chosen_place = expenses.values('place'). \
-                annotate(Count('place')).order_by('-place__count')
+            annotate(Count('place')).order_by('-place__count')
         if mostly_chosen_place:
             mostly_chosen_place = mostly_chosen_place[0]
 
@@ -214,3 +216,37 @@ class ExpenseDetail(APIView):
         expense = self.get_object(pk)
         expense.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SummaryMonthlyExpenses(APIView):
+    """
+    Summary of the last months
+    """
+    def get(self, request, format=None):
+        months_ago = 5
+        DATE_NOW = datetime.now().date()
+        if self.request.query_params.get('ma'):
+            if 0 < int(self.request.query_params.get('ma')) <= 10:
+                months_ago = self.request.query_params.get('ma')
+
+        summary = {"month_summary": []}
+        for month in range(months_ago):
+            date = DATE_NOW - relativedelta(months=month)
+            year = date.year
+            month = date.month
+            key = f'{year}-{month}'
+            query_params = {
+                'fyear': year,
+                'fmonth': month,
+                'tyear': year,
+                'tmonth': month
+            }
+            date_range = create_date_range(query_params)
+
+            expense = Expense.objects.filter(day__range=date_range)
+            summary['month_summary'].append({
+                'date': key,
+                'sum_of_prices': expense.aggregate(Sum('price'))['price__sum']
+            })
+
+        return Response(summary)
