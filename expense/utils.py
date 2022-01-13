@@ -1,5 +1,6 @@
 from rest_framework import exceptions
-from datetime import datetime
+from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
 
 MIN_YEAR = datetime.min.year
 MAX_YEAR = datetime.max.year
@@ -63,8 +64,17 @@ def create_date_range(query_params):
         query_value=query_params.get('tday')
     )
 
-    from_date = datetime(int(from_year), int(from_month), int(from_day))
-    to_date = datetime(int(to_year), int(to_month), int(to_day))
+    try:
+        from_date = datetime(int(from_year), int(from_month), int(from_day))
+    except ValueError:
+        from_date = datetime(int(from_year), int(from_month), 1)
+    
+    try:
+        to_date = datetime(int(to_year), int(to_month), int(to_day))
+    except ValueError:
+        max_day = (date(int(from_year), int(from_month), 5) + relativedelta(day=31)).day
+        to_date = datetime(int(to_year), int(to_month), max_day)
+
 
     if from_date > to_date:
         raise exceptions.ValidationError(
