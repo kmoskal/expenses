@@ -14,6 +14,15 @@ def create_date_form_query_param(
         min_value, max_value,
         to_date=False, query_value=None
 ):
+
+    if query_value:
+        try: 
+            query_value = int(query_value)
+        except ValueError:
+            raise esceptions.ValidationError(
+                {'detail': 'Value must be numeric'}
+            )
+
     if query_value:
         if min_value <= int(query_value) <= max_value:
             return query_value
