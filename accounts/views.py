@@ -1,16 +1,20 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, exceptions
 from rest_framework.permissions import AllowAny
-from .serializers import (RegisterSerializer, CustomUserSerializer,
-                          CustomUserProfileUpdateSerializer)
-from .utils import (generate_access_token,
-                    generate_refresh_token,
-                    generate_activation_token)
+from .serializers import (
+    RegisterSerializer, CustomUserSerializer,
+    CustomUserProfileUpdateSerializer,
+)
+from .utils import (
+    generate_access_token, generate_refresh_token, generate_activation_token,
+)
 from .models import ActivateAccount, CustomUser
 import jwt
 
@@ -44,6 +48,41 @@ class ActivateAccountView(APIView):
         user.save()
         account.delete()
         return Response({'detail': 'Account successfully activated'})
+
+
+@method_decorator(csrf_protect, name='put')
+class PasswordChange(APIView):
+
+    def put(self, request):
+        CustomUser = get_user_model()
+        password = request.data.get('password')
+        new_password = request.data.get('new_password')
+        retyped_new_password = request.data.get('retyped_new_password')
+
+        if (password is None) or (new_password is None) or \
+                (retyped_new_password is None):
+            raise exceptions.AuthenticationFailed('All fields are required')
+
+        user = CustomUser.objects.filter(id=request.user.id).first()
+        if user is None:
+            raise exceptions.AuthenticationFailed('Invalid email or password')
+        if not user.check_password(password):
+            raise exceptions.AuthenticationFailed('Invalid email or password')
+        if new_password != retyped_new_password:
+            raise exceptions.AuthenticationFailed(
+                'The new password and retyped password must be the same'
+            )
+
+        try:
+            validate_password(new_password)
+            user.set_password(new_password)
+            user.save()
+        except ValidationError as errors:
+            raise exceptions.ValidationError({'detail': list(errors)})
+
+        if not user.check_password(new_password):
+            return Response({'detail': 'Sometning went wrong'})
+        return Response({'detail': 'New password has been set'})
 
 
 @method_decorator(csrf_protect, name='put')

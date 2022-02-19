@@ -1,7 +1,7 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from .views import (RegisterCustomUser, GetTokensView, ActivateAccountView,
-                    ProfileView, RefreshTokenView)
+                    ProfileView, RefreshTokenView, PasswordChange)
 
 
 urlpatterns = [
@@ -22,5 +22,10 @@ urlpatterns = [
         'profile-update',
         ProfileView.as_view(),
         name='accounts-profile-update'
+    ),
+    path(
+        'password-change',
+        PasswordChange.as_view(),
+        name='accounts-password-change'
     ),
 ]
