@@ -1,0 +1,101 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-02-20 16:41+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
+"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+#: managers.py:12
+msgid "The email must be set"
+msgstr "Należy podać prawidłowy adres email."
+
+#: managers.py:24
+msgid "Superuser must have is_superuser=True."
+msgstr "Superuser musi mieć ustawiony parametr 'is_superuser=True'."
+
+#: models.py:12 models.py:31
+msgid "email address"
+msgstr "Adres email."
+
+#: models.py:13
+msgid "first name"
+msgstr "Imię"
+
+#: models.py:14
+msgid "last name"
+msgstr "Nazwisko"
+
+#: validators.py:20
+#, python-format
+msgid "Password must contains at least %(mdn)d digit."
+msgid_plural "Password must contains at least %(mdn)d digits."
+msgstr[0] "Hasło musi zawierać minimum %(mdn)d cyfrę."
+msgstr[1] "Hasło musi zawierać minimum %(mdn)d cyfry."
+msgstr[2] "Hasło musi zawierać minimum %(mdn)d cyfr."
+
+#: validators.py:31
+#, python-format
+msgid "Password mustt contains at least %(mdn)d digit."
+msgid_plural "Password mustt contains at least %(mdn)d digits."
+msgstr[0] "Hasło musi zawierać minimum %(mdn)d cyfrę."
+msgstr[1] "Hasło musi zawierać minimum %(mdn)d cyfry."
+msgstr[2] "Hasło musi zawierać minimum %(mdn)d cyfr."
+
+#: views.py:46
+msgid "No account to activate"
+msgstr ""
+
+#: views.py:51
+msgid "Account successfully activated"
+msgstr ""
+
+#: views.py:65
+msgid "All fields are required"
+msgstr "Należy wpełnić wszystkie pola."
+
+#: views.py:70 views.py:74 views.py:159 views.py:163
+msgid "Invalid email or password"
+msgstr "Niewłaściwy email lub hasło."
+
+#: views.py:78
+msgid "The new password and retyped password must be the same"
+msgstr "Nowe i powtórzone hasło się nie zgadzają."
+
+#: views.py:89
+msgid "Sometning went wrong"
+msgstr "Coś poszło nie tak."
+
+#: views.py:90
+msgid "New password has been set"
+msgstr "Nowe hasło zostało poprawnie ustawione."
+
+#: views.py:123
+msgid "Authentication credentials were not provided."
+msgstr ""
+
+#: views.py:133
+msgid "Expired refresh token, please login again."
+msgstr ""
+
+#: views.py:137 views.py:166
+msgid "User is not active"
+msgstr "Użytkownik jest nie aktywny."
+
+#: views.py:154
+msgid "Email/password required"
+msgstr "Podaj email oraz hasło."

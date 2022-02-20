@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 
 class MinimumDigitsNumberValidator:
@@ -14,15 +14,19 @@ class MinimumDigitsNumberValidator:
 
         if count < self.min_digits_number:
             raise ValidationError(
-                _(
-                    f'Password must contains at least '
-                    f'{self.min_digits_number} digit.'
-                ),
-                code='not enough digits',
+                ngettext(
+                    'Password must contains at least %(mdn)d digit.',
+
+                    'Password must contains at least %(mdn)d digits.',
+                    self.min_digits_number,
+                ) % {
+                    'mdn': self.min_digits_number,
+                }
             )
 
         def get_help_text(self):
-            return _(
-                f'Your password must contain at least '
-                f'{self.min_digits_number} digit.'
-            )
+            return ngettext(
+                'Password mustt contains at least %(mdn)d digit.',
+                'Password mustt contains at least %(mdn)d digits.',
+                self.min_digits_number,
+            ) % {'mdn': self.min_digits_number, }

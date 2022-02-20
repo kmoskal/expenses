@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -42,12 +43,12 @@ class ActivateAccountView(APIView):
     def get(self, request, token=None):
         account = ActivateAccount.objects.filter(token=token).first()
         if account is None:
-            raise exceptions.NotFound('No account to activate')
+            raise exceptions.NotFound(_('No account to activate'))
         user = CustomUser.objects.filter(email=account.email).first()
         user.is_active = True
         user.save()
         account.delete()
-        return Response({'detail': 'Account successfully activated'})
+        return Response({'detail': _('Account successfully activated')})
 
 
 @method_decorator(csrf_protect, name='put')
@@ -61,16 +62,20 @@ class PasswordChange(APIView):
 
         if (password is None) or (new_password is None) or \
                 (retyped_new_password is None):
-            raise exceptions.AuthenticationFailed('All fields are required')
+            raise exceptions.AuthenticationFailed(_('All fields are required'))
 
         user = CustomUser.objects.filter(id=request.user.id).first()
         if user is None:
-            raise exceptions.AuthenticationFailed('Invalid email or password')
+            raise exceptions.AuthenticationFailed(
+                _('Invalid email or password')
+            )
         if not user.check_password(password):
-            raise exceptions.AuthenticationFailed('Invalid email or password')
+            raise exceptions.AuthenticationFailed(
+                _('Invalid email or password')
+            )
         if new_password != retyped_new_password:
             raise exceptions.AuthenticationFailed(
-                'The new password and retyped password must be the same'
+                _('The new password and retyped password must be the same')
             )
 
         try:
@@ -81,8 +86,8 @@ class PasswordChange(APIView):
             raise exceptions.ValidationError({'detail': list(errors)})
 
         if not user.check_password(new_password):
-            return Response({'detail': 'Sometning went wrong'})
-        return Response({'detail': 'New password has been set'})
+            return Response({'detail': _('Sometning went wrong')})
+        return Response({'detail': _('New password has been set')})
 
 
 @method_decorator(csrf_protect, name='put')
@@ -115,7 +120,8 @@ class RefreshTokenView(APIView):
         refresh_token = request.COOKIES.get('refreshtoken')
         if refresh_token is None:
             raise exceptions.AuthenticationFailed(
-                'Authentication credentials were not provided.')
+                _('Authentication credentials were not provided.')
+            )
         try:
             payload = jwt.decode(
                 refresh_token,
@@ -124,10 +130,11 @@ class RefreshTokenView(APIView):
             )
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed(
-                'Expired refresh token, please login again.')
+                _('Expired refresh token, please login again.')
+            )
         user = CustomUser.objects.filter(id=payload.get('user_id')).first()
         if user is None:
-            raise exceptions.AuthenticationFailed('User is inactive')
+            raise exceptions.AuthenticationFailed(_('User is not active'))
 
         access_token = generate_access_token(user)
         return Response({'access_token': access_token})
@@ -144,15 +151,19 @@ class GetTokensView(APIView):
         password = request.data.get('password')
         response = Response()
         if (email is None) or (password is None):
-            raise exceptions.AuthenticationFailed('Email/password required')
+            raise exceptions.AuthenticationFailed(_('Email/password required'))
 
         user = CustomUser.objects.filter(email=email).first()
         if user is None:
-            raise exceptions.AuthenticationFailed('Invalid email or password')
+            raise exceptions.AuthenticationFailed(
+                _('Invalid email or password')
+            )
         if not user.check_password(password):
-            raise exceptions.AuthenticationFailed('Invalid email or password')
+            raise exceptions.AuthenticationFailed(
+                _('Invalid email or password')
+            )
         if not user.is_active:
-            raise exceptions.AuthenticationFailed('User is not active')
+            raise exceptions.AuthenticationFailed(_('User is not active'))
 
         serialized_user = self.serializers(user).data
 
