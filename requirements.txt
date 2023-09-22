@@ -1,7 +1,7 @@
 asgiref==3.4.1
 cffi==1.15.0
 coverage==6.2
-cryptography==36.0.1
+cryptography==41.0.4
 Django==3.2.12
 django-cors-headers==3.10.1
 django-extensions==3.1.5
